@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Role{
+  CUSTOMER
+  ORGANIZER
+}
+
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  referralCode  String   @unique
+  role          Role     @default(CUSTOMER)
+
+  referredById  Int?
+  referredBy    User?    @relation("UserReferral", fields: [referredById], references: [id])
+  referrals     User[]   @relation("UserReferral")
+
+  points        Point[]
+  coupons       Coupon[]
+  transactions  Transaction[]
+
+  organizers    Organizer[]  // ✅ ini aja cukup
+
+  createdAt     DateTime @default(now())
+}
+
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Int
+  date        DateTime
+
+  totalSeats  Int    @default(0)  // total kursi
+  availableSeats Int  @default(0)   // sisa kursi 🔥
+
+  organizerId Int
+  organizer   Organizer     @relation(fields: [organizerId], references: [id])
+  transactions Transaction[]
+
+  createdAt   DateTime @default(now())
+}
+
+
+
+model Transaction {
+  id        Int   @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+
+  quantity  Int   // 🔥 jumlah tiket
+
+  totalPrice Int
+  finalPrice Int
+  event Event @relation(fields: [eventId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Point {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Int
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Coupon {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  discount   Int
+  expiresAt  DateTime
+  isUsed     Boolean  @default(false)
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Organizer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int      @unique
+
+  user      User     @relation(fields: [userId], references: [id])
+  events    Event[]
+
+  createdAt DateTime @default(now())
+}
