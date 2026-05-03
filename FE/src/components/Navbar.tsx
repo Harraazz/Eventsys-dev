@@ -59,12 +59,12 @@ export default function Navbar() {
                             to={item.path}
                             onClick={() => setOpen(false)}
                             className={`
-                px-4 py-2 rounded-lg font-medium
-                ${location.pathname === item.path
+                                    px-4 py-2 rounded-lg font-medium
+                                    ${location.pathname === item.path
                                     ? "bg-yellow-400 text-gray-900"
                                     : "text-white hover:bg-gray-800"
                                 }
-              `}
+                                `}
                         >
                             {item.name}
                         </Link>
