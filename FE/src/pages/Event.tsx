@@ -36,6 +36,7 @@ export default function Events() {
         date: "",
         totalSeats: "",
     });
+
     const handleChange = (e: any) => {
         setForm({
             ...form,
@@ -60,11 +61,10 @@ export default function Events() {
             fetchEvents(); // reload data
         } catch (err) {
             console.log(err);
+            alert("Anda harus menjadi organizer!")
+            setIsOpen(false)
         }
     };
-
-
-
     return (
         <div className="text-white">
             {/* 🔥 HEADER */}
@@ -190,10 +190,6 @@ export default function Events() {
             )}
 
         </div>
-
-
     );
-
-
 }
 

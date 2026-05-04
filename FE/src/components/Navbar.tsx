@@ -50,7 +50,13 @@ export default function Navbar() {
                 <h2 className="text-yellow-400 text-xl font-bold mb-6">
                     LiteRate
                 </h2>
-                <h3 className="text-yellow-400 font-bold">{account?.email}||{account?.role}</h3>
+                {
+                    account === null ? (
+                        <h3 className="text-yellow-400 font-bold mb-5">Login terlebih dahulu</h3>
+                    ) : (
+                        <h3 className="text-yellow-400 font-bold">{account?.email}||{account?.role}</h3>
+                    )
+                }
 
                 <div className="flex flex-col gap-2">
                     {menu.map((item) => (

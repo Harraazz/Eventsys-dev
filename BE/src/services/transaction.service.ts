@@ -105,3 +105,19 @@ export const deleteTransaction = async (transactionId: number) => {
     return trx;
   });
 };
+
+export const listTransaction = async (userId: number) => {
+  return await prisma.transaction.findMany({
+    where: {
+      event: {
+        organizer: {
+          userId: userId,
+        },
+      },
+    },
+    include: {
+      user: true,
+      event: true,
+    },
+  });
+};
