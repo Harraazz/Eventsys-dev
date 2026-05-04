@@ -111,3 +111,30 @@ export const deleteEventController = async (req: Request, res: Response) => {
         });
     }
 }
+
+
+export const getEventByIdController = async (req: Request, res: Response) => {
+  try {
+    const eventId = Number(req.params.id);
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      return res.status(404).json({
+        message: "Event not found",
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Event fetched successfully",
+      data: event, // ✅ konsisten
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

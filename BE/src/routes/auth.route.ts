@@ -3,6 +3,10 @@ import { userSignup, userSignin, getProfileController } from "../controllers/aut
 import { createEventController, getListEventController, updateEventController, deleteEventController } from "../controllers/event.controller";
 import { becomeOrganizer } from "../controllers/organizer.controller";
 import { verifyToken } from "../middleware/auth.middleware";
+
+import { createReviewController, getReviewsController} from "../controllers/review.controller";
+import { getEventByIdController } from "../controllers/event.controller";
+
 const router = express.Router();
 
 router.post("/register", userSignup);
@@ -15,5 +19,13 @@ router.get("/event-list", getListEventController);
 router.put("/event/:id", verifyToken, updateEventController);
 // DELETE
 router.delete("/event/:id", verifyToken, deleteEventController);
+
+
+
+router.get("/event/:id", getEventByIdController);
+router.get("/reviews/:eventId", getReviewsController);
+router.post("/reviews", verifyToken, createReviewController);
+
+
 
 export default router;

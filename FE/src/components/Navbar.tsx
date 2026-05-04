@@ -19,6 +19,7 @@ export default function Navbar() {
 
     console.log(account);
     const menu = [
+        { name: "Home", path: "/home" },
         { name: "Dashboard", path: "/" },
         { name: "Events", path: "/events" },
         { name: "Transactions", path: "/transactions" },

@@ -31,3 +31,9 @@ export const getAccount = async () => {
     });
     return res.data;
 }
+
+
+export const getEventById = async (id: number) => {
+  const res = await api.get(`/events/${id}`);
+  return res.data;
+};

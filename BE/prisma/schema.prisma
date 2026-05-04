@@ -12,11 +12,11 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum Role{
+
+enum Role {
   CUSTOMER
   ORGANIZER
 }
-
 
 model User {
   id            Int      @id @default(autoincrement())
@@ -33,43 +33,72 @@ model User {
   coupons       Coupon[]
   transactions  Transaction[]
 
-  organizers    Organizer[]  // ✅ ini aja cukup
+  organizers    Organizer[]
+
+  reviews       Review[]   // dari schema 1
 
   createdAt     DateTime @default(now())
 }
 
+model Organizer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int      @unique
 
-model Event {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  price       Int
-  date        DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  events    Event[]
 
-  totalSeats  Int    @default(0)  // total kursi
-  availableSeats Int  @default(0)   // sisa kursi 🔥
-
-  organizerId Int
-  organizer   Organizer     @relation(fields: [organizerId], references: [id])
-  transactions Transaction[]
-
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
+model Event {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String
+  price          Int
+  location       String   // dari schema 1
+  category       String   // dari schema 1
+  date           DateTime
 
+  totalSeats     Int      @default(0)
+  availableSeats Int      @default(0)
+
+  organizerId    Int
+  organizer      Organizer @relation(fields: [organizerId], references: [id])
+
+  transactions   Transaction[]
+  reviews        Review[]        // dari schema 1
+
+  createdAt      DateTime @default(now())
+}
 
 model Transaction {
-  id        Int   @id @default(autoincrement())
-  userId    Int
-  eventId   Int
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  eventId    Int
 
-  quantity  Int   // 🔥 jumlah tiket
-
+  quantity   Int
   totalPrice Int
   finalPrice Int
+
+  user  User  @relation(fields: [userId], references: [id])
   event Event @relation(fields: [eventId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+
   createdAt DateTime @default(now())
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  userId    Int
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
 }
 
 model Point {
@@ -89,15 +118,4 @@ model Coupon {
   isUsed     Boolean  @default(false)
 
   user       User     @relation(fields: [userId], references: [id])
-}
-
-model Organizer {
-  id        Int      @id @default(autoincrement())
-  name      String
-  userId    Int      @unique
-
-  user      User     @relation(fields: [userId], references: [id])
-  events    Event[]
-
-  createdAt DateTime @default(now())
 }

@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { getEvents, createEvent, } from "../service/api";
 
+import { useNavigate } from "react-router-dom";
+
+
+
 export default function Events() {
+
+
+const navigate = useNavigate();
+
+
     const [events, setEvents] = useState<any[]>([]);
 
     const [isOpen, setIsOpen] = useState(false);
@@ -189,7 +198,17 @@ export default function Events() {
                 </div>
             )}
 
+
+
+        <button
+          onClick={() => navigate("/create-event")}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          + Create Event
+        </button>
+
         </div>
+
 
 
     );
