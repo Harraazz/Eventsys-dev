@@ -20,4 +20,4 @@ router.delete("/event/:id", verifyToken, deleteEventController);
 // Transaction
 router.get("/transactions", listTransactionController);
 
-export default router;
+export default router; 
