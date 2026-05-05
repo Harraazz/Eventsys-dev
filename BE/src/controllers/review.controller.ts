@@ -1,21 +1,41 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
+import { createReviewService } from "../services/review.service";
 
 // 🔥 CREATE REVIEW
 export const createReviewController = async (req: Request, res: Response) => {
   try {
-    const { rating, comment, userId, eventId } = req.body;
+    const { rating, comment } = req.body;
+
+    const userId = (req as any).user?.id; // ✅ ambil id, bukan object
+    const eventId = Number(req.body.eventId);
+
+    // 🔍 DEBUG (optional, tapi sangat membantu)
+    console.log({
+      rating,
+      comment,
+      userId,
+      eventId,
+      params: req.params,
+      body: req.body,
+    });
 
     // ✅ VALIDASI
-    if (!rating) {
+    if (rating === undefined || rating === null) {
       return res.status(400).json({
         message: "Rating wajib diisi",
       });
     }
 
-    if (!userId || !eventId) {
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    if (!eventId || isNaN(eventId)) {
       return res.status(400).json({
-        message: "userId & eventId wajib",
+        message: "Event ID tidak valid",
       });
     }
 
@@ -25,18 +45,15 @@ export const createReviewController = async (req: Request, res: Response) => {
       });
     }
 
-    const review = await prisma.review.create({
-      data: {
-        rating,
-        userId,
-        eventId,
-        comment: comment || null, // biar gak error kalau kosong
-      },
-    });
+    // ✅ KIRIM KE SERVICE
+    const review = await createReviewService(
+      userId,
+      eventId,
+      rating,
+      comment
+    );
 
-    console.log("✅ Review created:", review);
-
-    res.status(201).json(review);
+    return res.status(201).json(review);
   } catch (error: any) {
     console.log("❌ ERROR CREATE REVIEW:", error);
 
@@ -46,12 +63,11 @@ export const createReviewController = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(500).json({
-      message: "Failed create review",
+    return res.status(500).json({
+      message: error.message || "Failed create review",
     });
   }
 };
-
 // 🔥 GET REVIEWS BY EVENT
 export const getReviewsController = async (req: Request, res: Response) => {
   try {

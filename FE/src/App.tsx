@@ -14,7 +14,6 @@ import CreateEvent from "./pages/CreateEvent";
 function App() {
   return (
     <BrowserRouter>
-      \
       <Routes>
         {/* ❌ TANPA NAVBAR */}
         <Route path="/login" element={<Login />} />
@@ -22,15 +21,15 @@ function App() {
 
         {/* ✔ PAKAI NAVBAR */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/events" element={<Events />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/users" element={<Users />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/events/:id" element={<EventDetail />} />
           <Route path="/create-event" element={<CreateEvent />} />
-        </Routes>
-      </div>
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
