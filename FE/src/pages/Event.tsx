@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { getEvents, createEvent, updateEvent, deleteEvent } from "../service/api";
 
+import { useNavigate } from "react-router-dom";
+
+
+
 export default function Events() {
+
+
+const navigate = useNavigate();
+
+
     const [events, setEvents] = useState<any[]>([]);
     const [isEdit, setIsEdit] = useState(false);
     const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -103,12 +112,13 @@ export default function Events() {
                     Events
                 </h1>
 
-                <button
-                    onClick={handleCreate}
-                    className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90"
-                >
-                    + Create Event
-                </button>
+          <button
+          onClick={() => navigate("/create-event")}
+          className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90"
+        >
+          + Create Event
+        </button>
+
             </div>
 
             {/* 🔥 EMPTY STATE */}
@@ -227,6 +237,14 @@ export default function Events() {
                     </div>
                 </div>
             )}
+
+
+
+
+
+
+
+
 
         </div>
     );

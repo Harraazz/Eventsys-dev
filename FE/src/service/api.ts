@@ -58,6 +58,12 @@ export const becomeOrganizer = async (data: any) => {
 export const deleteEvent = async (id: number) => {
     const res = await api.delete(`/event/${id}`);
     return res.data;
+}
+
+
+export const getEventById = async (id: number) => {
+    const res = await api.get(`/events/${id}`);
+    return res.data;
 };
 
 export const getPoint = async () => {
