@@ -3,7 +3,9 @@ import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Event";
 import Transactions from "./pages/Transaction";
 import Users from "./pages/User";
-import Navbar from "./components/Navbar";
+import MainLayout from "./layout/Navlayout";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import "./index.css";
 import Home from "./pages/Home";
 import EventDetail from "./pages/EventDetail";
@@ -12,10 +14,14 @@ import CreateEvent from "./pages/CreateEvent";
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      \
+      <Routes>
+        {/* ❌ TANPA NAVBAR */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      <div className="md:ml-64 p-4">
-        <Routes>
+        {/* ✔ PAKAI NAVBAR */}
+        <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/events" element={<Events />} />
           <Route path="/transactions" element={<Transactions />} />

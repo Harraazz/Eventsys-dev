@@ -70,9 +70,12 @@ export const createEventController = async (req: Request, res: Response) => {
 
 export const getListEventController = async (req: Request, res: Response) => {
     try {
-        const events = await getListEvent();
-        return res.status(200).json({
-            message: "Events fetched successfully",
+        const userId = (req as any).user.id;
+        const role = (req as any).user.role;
+
+        const events = await getListEvent(userId, role);
+
+        return res.json({
             data: events,
         });
     } catch (error) {
@@ -80,7 +83,7 @@ export const getListEventController = async (req: Request, res: Response) => {
             message: "Internal server error",
         });
     }
-}
+};
 
 export const updateEventController = async (req: Request, res: Response) => {
     try {
@@ -109,10 +112,9 @@ export const updateEventController = async (req: Request, res: Response) => {
     }
 };
 
-
 export const deleteEventController = async (req: Request, res: Response) => {
     try {
-        const { eventId } = req.body;
+        const eventId = Number(req.params.id);
 
         if (!eventId) {
             return res.status(400).json({

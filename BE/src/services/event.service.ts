@@ -27,8 +27,22 @@ export const createEvent = async (
   return event;
 };
 
-export const getListEvent = async () => {
+export const getListEvent = async (userId: number, role: string) => {
+    if (role === "ADMIN") {
+        const event = await prisma.event.findMany({
+            include: {
+                organizer: true,
+            }
+        })
+        return event
+    }
+
     const event = await prisma.event.findMany({
+        where: {
+            organizer: {
+                userId,
+            },
+        },
         include: {
             organizer: true,
         }
