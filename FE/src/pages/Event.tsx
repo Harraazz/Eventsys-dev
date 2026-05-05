@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { getEvents, createEvent, } from "../service/api";
+import { getEvents, createEvent, updateEvent, deleteEvent } from "../service/api";
 
 export default function Events() {
     const [events, setEvents] = useState<any[]>([]);
-
+    const [isEdit, setIsEdit] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     useEffect(() => {
         fetchEvents();
@@ -16,16 +17,29 @@ export default function Events() {
         });
     };
 
-
-
-    const handleDelete = (id: number) => {
-        console.log("delete event:", id);
-        // nanti sambung ke API delete
+    const handleDelete = async (id: number) => {
+        try {
+            if (confirm("Are you sure to delete this event?")) {
+                await deleteEvent(id);
+                fetchEvents();
+            }
+        } catch (err) {
+            console.log(err);
+        }
     };
 
-    const handleEdit = (id: number) => {
-        console.log("edit event:", id);
-        // nanti buka modal/form
+    const handleEdit = (event: any) => {
+        setIsEdit(true);
+        setIsOpen(true);
+        setSelectedId(event.id);
+
+        setForm({
+            title: event.title,
+            description: event.description,
+            price: event.price,
+            date: event.date.split("T")[0],
+            totalSeats: event.totalSeats,
+        });
     };
 
 
@@ -36,6 +50,7 @@ export default function Events() {
         date: "",
         totalSeats: "",
     });
+
     const handleChange = (e: any) => {
         setForm({
             ...form,
@@ -44,26 +59,41 @@ export default function Events() {
     };
 
     const handleCreate = () => {
-        console.log("create event");
-        setIsOpen(true)
+        setIsEdit(false);
+        setForm({
+            title: "",
+            description: "",
+            price: "",
+            date: "",
+            totalSeats: "",
+        });
+        setIsOpen(true);
     };
 
     const handleSubmit = async () => {
         try {
-            await createEvent({
-                ...form,
-                price: Number(form.price),
-                totalSeats: Number(form.totalSeats),
-            });
+            if (isEdit) {
+                await updateEvent(selectedId, {
+                    ...form,
+                    price: Number(form.price),
+                    totalSeats: Number(form.totalSeats),
+                });
+            } else {
+                await createEvent({
+                    ...form,
+                    price: Number(form.price),
+                    totalSeats: Number(form.totalSeats),
+                });
+            }
 
             setIsOpen(false);
-            fetchEvents(); // reload data
+            setIsEdit(false);
+            fetchEvents();
         } catch (err) {
             console.log(err);
+            alert("Error bro");
         }
     };
-
-
 
     return (
         <div className="text-white">
@@ -111,7 +141,7 @@ export default function Events() {
                             {/* 🔥 ACTION BUTTON */}
                             <div className="flex gap-2 mt-4">
                                 <button
-                                    onClick={() => handleEdit(event.id)}
+                                    onClick={() => handleEdit(event)}
                                     className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-1 rounded-lg text-sm"
                                 >
                                     Edit
@@ -139,34 +169,43 @@ export default function Events() {
                         <div className="flex flex-col gap-3">
                             <input
                                 name="title"
-                                placeholder="Title"
+                                value={form.title}
                                 onChange={handleChange}
+                                placeholder="Title"
                                 className="p-2 rounded bg-gray-800 text-white"
                             />
+
                             <input
                                 name="description"
-                                placeholder="Description"
+                                value={form.description}
                                 onChange={handleChange}
+                                placeholder="Description"
                                 className="p-2 rounded bg-gray-800 text-white"
                             />
+
                             <input
                                 name="price"
                                 type="number"
-                                placeholder="Price"
+                                value={form.price}
                                 onChange={handleChange}
+                                placeholder="Price"
                                 className="p-2 rounded bg-gray-800 text-white"
                             />
+
                             <input
                                 name="date"
                                 type="date"
+                                value={form.date}
                                 onChange={handleChange}
                                 className="p-2 rounded bg-gray-800 text-white"
                             />
+
                             <input
                                 name="totalSeats"
                                 type="number"
-                                placeholder="Total Seats"
+                                value={form.totalSeats}
                                 onChange={handleChange}
+                                placeholder="Total Seats"
                                 className="p-2 rounded bg-gray-800 text-white"
                             />
                         </div>
@@ -190,10 +229,6 @@ export default function Events() {
             )}
 
         </div>
-
-
     );
-
-
 }
 
