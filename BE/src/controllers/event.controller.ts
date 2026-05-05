@@ -92,10 +92,9 @@ export const updateEventController = async (req: Request, res: Response) => {
     }
 };
 
-
 export const deleteEventController = async (req: Request, res: Response) => {
     try {
-        const { eventId } = req.body;
+        const eventId = Number(req.params.id);
 
         if (!eventId) {
             return res.status(400).json({

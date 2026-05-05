@@ -16,8 +16,6 @@ export const createTransaction = async (
     });
 
     if (!event) throw new Error("Event not found");
-
-    // 2. cek seat
     if (event.availableSeats < quantity) {
       throw new Error("Not enough seats");
     }
@@ -89,35 +87,15 @@ export const createTransaction = async (
   });
 };
 
-export const deleteTransaction = async (transactionId: number) => {
-  return await prisma.$transaction(async (tx) => {
-    const trx = await tx.transaction.findUnique({
-      where: { id: transactionId },
-    });
-
-    if (!trx) throw new Error("Transaction not found");
-
-
-    await tx.transaction.delete({
-      where: { id: transactionId },
-    });
-
-    return trx;
-  });
-};
-
-export const listTransaction = async (userId: number) => {
-  return await prisma.transaction.findMany({
+export const getTransaction = async (userId: number) => {
+  const result = await prisma.transaction.findMany({
     where: {
-      event: {
-        organizer: {
-          userId: userId,
-        },
-      },
+      userId: userId,
     },
     include: {
-      user: true,
       event: true,
-    },
-  });
-};
+      user: true,
+    }
+  })
+  return result;
+}

@@ -1,40 +1,56 @@
 import { useEffect, useState } from "react";
-import { getEvents, createEvent, } from "../service/api";
+import { getTransactions, createTransaction, deleteTransaction, updateTransaction } from "../service/api.transaction";
+import { getEvents } from "../service/api";
 
-export default function Transaction() {
-    const [events, setEvents] = useState<any[]>([]);
-
+export default function Events() {
+    const [eventList, setEventList] = useState<any[]>([]);
+    const [transactions, setTransactions] = useState([]);
+    const [isEdit, setIsEdit] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     useEffect(() => {
-        fetchEvents();
-
+        fetchEventList();
+        fetchTransactionList();
     }, []);
 
-    const fetchEvents = () => {
-        getEvents().then((data) => {
-            setEvents(data.data);
+    const fetchEventList = () => {
+        getEvents().then((res) => {
+            setEventList(res.data);
+        });
+    };
+
+    const fetchTransactionList = () => {
+        getTransactions().then((res) => {
+            setTransactions(res.data);
+        });
+    };
+
+    const handleDelete = async (id: number) => {
+        try {
+            if (confirm("Are you sure to delete this event?")) {
+                await deleteTransaction(id);
+                fetchTransactionList();
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleEdit = (tx: any) => {
+        setIsEdit(true);
+        setIsOpen(true);
+        setSelectedId(tx.id);
+
+        setForm({
+            eventId: tx.eventId,
+            quantity: tx.quantity,
         });
     };
 
 
-
-    const handleDelete = (id: number) => {
-        console.log("delete event:", id);
-        // nanti sambung ke API delete
-    };
-
-    const handleEdit = (id: number) => {
-        console.log("edit event:", id);
-        // nanti buka modal/form
-    };
-
-
     const [form, setForm] = useState({
-        title: "",
-        description: "",
-        price: "",
-        date: "",
-        totalSeats: "",
+        eventId: "",
+        quantity: "",
     });
 
     const handleChange = (e: any) => {
@@ -45,26 +61,36 @@ export default function Transaction() {
     };
 
     const handleCreate = () => {
-        console.log("create event");
-        setIsOpen(true)
+        setIsEdit(false);
+        setForm({
+            eventId: "",
+            quantity: "",
+        });
+        setIsOpen(true);
     };
 
     const handleSubmit = async () => {
         try {
-            await createEvent({
-                ...form,
-                price: Number(form.price),
-                totalSeats: Number(form.totalSeats),
-            });
+            if (isEdit) {
+                await updateTransaction(selectedId, {
+                    eventId: Number(form.eventId),
+                    quantity: Number(form.quantity),
+                });
+            } else {
+                await createTransaction({
+                    eventId: Number(form.eventId),
+                    quantity: Number(form.quantity),
+                });
+            }
 
             setIsOpen(false);
-            fetchEvents(); // reload data
+            fetchEventList();
         } catch (err) {
             console.log(err);
-            alert("Anda harus menjadi organizer!")
-            setIsOpen(false)
+            alert("Error bro");
         }
     };
+
     return (
         <div className="text-white">
             {/* 🔥 HEADER */}
@@ -77,54 +103,78 @@ export default function Transaction() {
                     onClick={handleCreate}
                     className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90"
                 >
-                    + Create Event
+                    + Transactions
                 </button>
             </div>
 
             {/* 🔥 EMPTY STATE */}
-            {events.length === 0 ? (
-                <p className="text-gray-400">Transactions are empty</p>
+            {transactions.length === 0 ? (
+                <p className="text-gray-400">No Transactions available</p>
             ) : (
-                /* 🔥 GRID */
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {events.map((event) => (
-                        <div
-                            key={event.id}
-                            className="bg-gray-900 p-4 rounded-xl shadow-md hover:shadow-lg transition"
-                        >
-                            <h3 className="text-lg font-bold text-yellow-400">
-                                {event.title}
-                            </h3>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-gray-900 rounded-xl overflow-hidden">
+                        <thead className="bg-gray-800 text-yellow-400 text-sm">
+                            <tr>
+                                <th className="p-3 text-left">Event</th>
+                                <th className="p-3 text-left">Price</th>
+                                <th className="p-3 text-left">Quantity</th>
+                                <th className="p-3 text-left">Total</th>
+                                <th className="p-3 text-left">Date</th>
+                                <th className="p-3 text-left">Attendance</th>
+                                <th className="p-3 text-center">Action</th>
+                            </tr>
+                        </thead>
 
-                            <p className="text-gray-300 text-sm mt-1">
-                                {event.description}
-                            </p>
-
-                            <p className="mt-2">
-                                💰 Rp {event.price}
-                            </p>
-
-                            <p className="text-sm text-gray-400">
-                                🎟 Seats: {event.availableSeats}
-                            </p>
-
-                            {/* 🔥 ACTION BUTTON */}
-                            <div className="flex gap-2 mt-4">
-                                <button
-                                    onClick={() => handleEdit(event.id)}
-                                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-1 rounded-lg text-sm"
+                        <tbody>
+                            {transactions.map((tx: any) => (
+                                <tr
+                                    key={tx.id}
+                                    className="border-b border-gray-800 hover:bg-gray-800 text-sm"
                                 >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(event.id)}
-                                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 rounded-lg text-sm"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                                    {/* 🔥 ambil dari relation */}
+                                    <td className="p-3">
+                                        {tx.event?.title}
+                                    </td>
+
+                                    <td className="p-3">
+                                        Rp {tx.event?.price}
+                                    </td>
+
+                                    <td className="p-3">
+                                        {tx.quantity}
+                                    </td>
+
+                                    <td className="p-3">
+                                        Rp {tx.totalPrice}
+                                    </td>
+
+                                    <td className="p-3">
+                                        {new Date(tx.createdAt).toLocaleDateString()}
+                                    </td>
+
+                                    <td className="p-3">
+                                        {tx.user?.email}
+                                    </td>
+
+                                    <td className="p-3 flex gap-2 justify-center">
+                                        <button
+                                            onClick={() => handleEdit(tx)}
+                                            className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-white text-xs"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleDelete(tx.id)}
+                                            className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white text-xs"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
 
@@ -132,40 +182,29 @@ export default function Transaction() {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-gray-900 p-6 rounded-xl w-full max-w-md">
                         <h2 className="text-yellow-400 text-xl font-bold mb-4">
-                            Create Transactions
+                            Create Event
                         </h2>
 
                         <div className="flex flex-col gap-3">
-                            <input
-                                name="title"
-                                placeholder="Title"
+                            <select
+                                name="eventId"
+                                value={form.eventId}
                                 onChange={handleChange}
                                 className="p-2 rounded bg-gray-800 text-white"
-                            />
+                            >
+                                <option value="">Select Event</option>
+                                {eventList.map((ev) => (
+                                    <option key={ev.id} value={ev.id}>
+                                        {ev.title} (Rp {ev.price})
+                                    </option>
+                                ))}
+                            </select>
                             <input
-                                name="description"
-                                placeholder="Description"
-                                onChange={handleChange}
-                                className="p-2 rounded bg-gray-800 text-white"
-                            />
-                            <input
-                                name="price"
+                                name="quantity"
                                 type="number"
-                                placeholder="Price"
+                                value={form.quantity}
                                 onChange={handleChange}
-                                className="p-2 rounded bg-gray-800 text-white"
-                            />
-                            <input
-                                name="date"
-                                type="date"
-                                onChange={handleChange}
-                                className="p-2 rounded bg-gray-800 text-white"
-                            />
-                            <input
-                                name="totalSeats"
-                                type="number"
-                                placeholder="Total Seats"
-                                onChange={handleChange}
+                                placeholder="Quantity"
                                 className="p-2 rounded bg-gray-800 text-white"
                             />
                         </div>
@@ -187,6 +226,7 @@ export default function Transaction() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }
