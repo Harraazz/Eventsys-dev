@@ -56,8 +56,8 @@ model Event {
   title          String
   description    String
   price          Int
-  location String @default("Unknown")
-category String @default("General")
+  location       String   // dari schema 1
+  category       String   // dari schema 1
   date           DateTime
 
   totalSeats     Int      @default(0)
@@ -68,6 +68,7 @@ category String @default("General")
 
   transactions   Transaction[]
   reviews        Review[]        // dari schema 1
+
   createdAt      DateTime @default(now())
 }
 

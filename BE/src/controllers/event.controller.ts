@@ -4,48 +4,68 @@ import { createEvent, getListEvent, updateEvent, deleteEvent } from "../services
 import prisma from "../lib/prisma";
 
 export const createEventController = async (req: Request, res: Response) => {
-    try {
-        const { title, description, price, date, totalSeats } = req.body;
+  try {
+    const { title, description, price, date, totalSeats, location, category } = req.body;
 
-        if (!title || !description || !price || !date || !totalSeats) {
-            return res.status(400).json({
-                message: "All fields are required",
-            });
-        }
-
-        // 🔥 ambil user dari JWT (nanti middleware)
-        const userId = (req as any).user.id;
-
-        // 🔥 cari organizer milik user
-        const organizer = await prisma.organizer.findFirst({
-            where: { userId },
-        });
-
-        if (!organizer) {
-            return res.status(403).json({
-                message: "You are not an organizer",
-            });
-        }
-
-        const event = await createEvent(
-            title,
-            description,
-            price,
-            date,
-            totalSeats,
-            organizer.id // ✅ aman
-        );
-
-        return res.status(201).json({
-            message: "Event created successfully",
-            data: event,
-        });
-    } catch (error: any) {
-        console.log(error);
-        return res.status(500).json({
-            message: "Internal server error",
-        });
+    // ✅ VALIDASI (fix price + field tambahan)
+    if (
+      !title ||
+      !description ||
+      price === undefined ||
+      !date ||
+      !totalSeats ||
+      !location ||
+      !category
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
     }
+
+    // ✅ AMANIN USER
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const userId = user.id;
+
+    // 🔥 cari organizer milik user
+    const organizer = await prisma.organizer.findFirst({
+      where: { userId },
+    });
+
+    if (!organizer) {
+      return res.status(403).json({
+        message: "You are not an organizer",
+      });
+    }
+
+    // ✅ KIRIM KE SERVICE (tambah param baru)
+    const event = await createEvent(
+      title,
+      description,
+      price,
+      date,
+      totalSeats,
+      organizer.id,
+      location,   // 🔥 tambah ini
+      category    // 🔥 tambah ini
+    );
+
+    return res.status(201).json({
+      message: "Event created successfully",
+      data: event,
+    });
+  } catch (error: any) {
+    console.log("❌ CREATE EVENT ERROR:", error);
+
+    return res.status(500).json({
+      message: error.message || "Internal server error", // 🔥 biar keliatan error asli
+    });
+  }
 };
 
 export const getListEventController = async (req: Request, res: Response) => {
@@ -113,3 +133,30 @@ export const deleteEventController = async (req: Request, res: Response) => {
         });
     }
 }
+
+
+export const getEventByIdController = async (req: Request, res: Response) => {
+  try {
+    const eventId = Number(req.params.id);
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      return res.status(404).json({
+        message: "Event not found",
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Event fetched successfully",
+      data: event, // ✅ konsisten
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

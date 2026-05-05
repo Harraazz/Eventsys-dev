@@ -4,6 +4,10 @@ import { createEventController, getListEventController, updateEventController, d
 import { becomeOrganizer } from "../controllers/organizer.controller";
 import { createTransactionController, getListTransaction } from "../controllers/transaction.controller";
 import { verifyToken } from "../middleware/auth.middleware";
+
+import { createReviewController, getReviewsController} from "../controllers/review.controller";
+import { getEventByIdController } from "../controllers/event.controller";
+
 const router = express.Router();
 // auth
 router.post("/register", userSignup);
@@ -17,10 +21,12 @@ router.get("/event-list", verifyToken, getListEventController);
 router.put("/event/:id", verifyToken, updateEventController);
 router.delete("/event/:id", verifyToken, deleteEventController);
 
-// Transaction
-router.get("/transactions-list", verifyToken, getListTransaction);
-// router.put("/transaction/:id", verifyToken, updateTransactionController);
-router.post("/transaction", verifyToken, createTransactionController);
-// router.delete("/transaction/:id", verifyToken, deleteTransactionController);
 
-export default router; 
+
+router.get("/event/:id", getEventByIdController);
+router.get("/reviews/:eventId", getReviewsController);
+router.post("/reviews", verifyToken, createReviewController);
+
+
+
+export default router;
