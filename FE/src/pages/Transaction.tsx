@@ -60,14 +60,14 @@ export default function Events() {
         });
     };
 
-    const handleCreate = () => {
-        setIsEdit(false);
-        setForm({
-            eventId: "",
-            quantity: "",
-        });
-        setIsOpen(true);
-    };
+    // const handleCreate = () => {
+    //     setIsEdit(false);
+    //     setForm({
+    //         eventId: "",
+    //         quantity: "",
+    //     });
+    //     setIsOpen(true);
+    // };
 
     const handleSubmit = async () => {
         try {
@@ -99,12 +99,12 @@ export default function Events() {
                     Transactions
                 </h1>
 
-                <button
+                {/* <button
                     onClick={handleCreate}
                     className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90"
                 >
                     + Transactions
-                </button>
+                </button> */}
             </div>
 
             {/* 🔥 EMPTY STATE */}

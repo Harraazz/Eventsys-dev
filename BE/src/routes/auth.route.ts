@@ -2,6 +2,7 @@ import express from "express";
 import { userSignup, userSignin, getProfileController } from "../controllers/auth.controller";
 import { createEventController, getListEventController, updateEventController, deleteEventController } from "../controllers/event.controller";
 import { becomeOrganizer } from "../controllers/organizer.controller";
+import { pointController } from "../controllers/point.controller";
 import { createTransactionController, getListTransaction } from "../controllers/transaction.controller";
 import { verifyToken } from "../middleware/auth.middleware";
 const router = express.Router();
@@ -9,6 +10,7 @@ const router = express.Router();
 router.post("/register", userSignup);
 router.post("/login", userSignin);
 router.get("/profile", verifyToken, getProfileController);
+router.get("/point", verifyToken, pointController);
 
 // event
 router.post("/create-event", verifyToken, createEventController);
