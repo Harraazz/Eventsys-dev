@@ -29,7 +29,7 @@ export default function EventDetail() {
       const res = await fetch(`http://localhost:3000/api/reviews/${eventId}`);
       const data = await res.json();
 
-      setReviews(Array.isArray(data?.data) ? data.data : []);
+      setReviews(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("FETCH REVIEW ERROR:", err);
       setReviews([]);

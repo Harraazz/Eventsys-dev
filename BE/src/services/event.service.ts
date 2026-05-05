@@ -1,26 +1,30 @@
 import prisma from "../lib/prisma";
 
 export const createEvent = async (
-    title: string,
-    description: string,
-    price: number,
-    date: Date,
-    totalSeats: number,
-    organizerId: number
+  title: string,
+  description: string,
+  price: number,
+  date: Date,
+  totalSeats: number,
+  organizerId: number,
+  location: string,
+  category: string
 ) => {
-    const event = await prisma.event.create({
-        data: {
-            title,
-            description,
-            price,
-            date: new Date(date),
-            totalSeats,
-            availableSeats: totalSeats,
-            organizerId,
-        },
-    });
+  const event = await prisma.event.create({
+    data: {
+      title,
+      description,
+      price,
+      date: new Date(date),
+      totalSeats,
+      availableSeats: totalSeats,
+      organizerId,
+      location,   // ✅ TAMBAH INI
+      category,   // ✅ TAMBAH INI
+    },
+  });
 
-    return event;
+  return event;
 };
 
 export const getListEvent = async () => {

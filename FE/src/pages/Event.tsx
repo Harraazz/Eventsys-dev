@@ -82,12 +82,13 @@ const navigate = useNavigate();
                     Events
                 </h1>
 
-                <button
-                    onClick={handleCreate}
-                    className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90"
-                >
-                    + Create Event
-                </button>
+          <button
+          onClick={() => navigate("/create-event")}
+          className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90"
+        >
+          + Create Event
+        </button>
+
             </div>
 
             {/* 🔥 EMPTY STATE */}
@@ -200,19 +201,13 @@ const navigate = useNavigate();
 
 
 
-        <button
-          onClick={() => navigate("/create-event")}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          + Create Event
-        </button>
+
+
+
+
+
 
         </div>
-
-
-
     );
-
-
 }
 
