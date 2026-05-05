@@ -1,18 +1,19 @@
 import prisma from "../lib/prisma";
 
 // 🔥 CREATE REVIEW
-export const createReviewService = async (data: {
-  userId: number;
-  eventId: number;
-  rating: number;
-  comment?: string;
-}) => {
+
+export const createReviewService = async (
+  userId: number,
+  eventId: number,
+  rating: number,
+  comment?: string
+) => {
   return prisma.review.create({
     data: {
-      userId: data.userId,
-      eventId: data.eventId,
-      rating: data.rating,
-      comment: data.comment || "",
+      userId,
+      eventId,
+      rating,
+      comment: comment ?? "", // ✅ pakai input user
     },
   });
 };

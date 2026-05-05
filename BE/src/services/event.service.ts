@@ -1,55 +1,60 @@
 import prisma from "../lib/prisma";
 
 export const createEvent = async (
-  title: string,
-  description: string,
-  price: number,
-  date: Date,
-  totalSeats: number,
-  organizerId: number,
-  location: string,
-  category: string
+    title: string,
+    description: string,
+    price: number,
+    date: Date,
+    totalSeats: number,
+    organizerId: number,
+    location: string,
+    category: string
 ) => {
-  const event = await prisma.event.create({
-    data: {
-      title,
-      description,
-      price,
-      date: new Date(date),
-      totalSeats,
-      availableSeats: totalSeats,
-      organizerId,
-      location,   // ✅ TAMBAH INI
-      category,   // ✅ TAMBAH INI
-    },
-  });
+    const event = await prisma.event.create({
+        data: {
+            title,
+            description,
+            price,
+            date: new Date(date),
+            totalSeats,
+            availableSeats: totalSeats,
+            organizerId,
+            location,   // ✅ TAMBAH INI
+            category,   // ✅ TAMBAH INI
+        },
+    });
 
-  return event;
+    return event;
 };
 
 export const getListEvent = async (userId: number, role: string) => {
-    if (role === "ADMIN") {
-        const event = await prisma.event.findMany({
+
+    // ✅ ADMIN & CUSTOMER → lihat semua event
+    if (role === "ADMIN" || role === "CUSTOMER") {
+        return await prisma.event.findMany({
             include: {
                 organizer: true,
-            }
-        })
-        return event
+            },
+        });
     }
 
-    const event = await prisma.event.findMany({
-        where: {
-            organizer: {
-                userId,
+    // ✅ ORGANIZER → hanya event miliknya
+    if (role === "ORGANIZER") {
+        return await prisma.event.findMany({
+            where: {
+                organizer: {
+                    userId,
+                },
             },
-        },
-        include: {
-            organizer: true,
-        }
-    })
-    return event
-}
+            include: {
+                organizer: true,
+            },
+        });
+    }
 
+    // fallback (optional safety)
+    return [];
+};
 export const updateEvent = async (
     title: string,
     description: string,

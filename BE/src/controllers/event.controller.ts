@@ -24,6 +24,7 @@ export const createEventController = async (req: Request, res: Response) => {
 
     // ✅ AMANIN USER
     const user = (req as any).user;
+
     if (!user) {
       return res.status(401).json({
         message: "Unauthorized",
@@ -69,69 +70,69 @@ export const createEventController = async (req: Request, res: Response) => {
 };
 
 export const getListEventController = async (req: Request, res: Response) => {
-    try {
-        const userId = (req as any).user.id;
-        const role = (req as any).user.role;
+  try {
+    const userId = (req as any).user.id;
+    const role = (req as any).user.role;
 
-        const events = await getListEvent(userId, role);
+    const events = await getListEvent(userId, role);
 
-        return res.json({
-            data: events,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Internal server error",
-        });
-    }
+    return res.json({
+      data: events,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 };
 
 export const updateEventController = async (req: Request, res: Response) => {
-    try {
-        const { title, description, price, date, totalSeats } = req.body;
-        const eventId = Number(req.params.id);
-        const userId = (req as any).user.id;
+  try {
+    const { title, description, price, date, totalSeats } = req.body;
+    const eventId = Number(req.params.id);
+    const userId = (req as any).user.id;
 
-        const event = await updateEvent(
-            title,
-            description,
-            price,
-            date,
-            totalSeats,
-            eventId,
-            userId
-        );
+    const event = await updateEvent(
+      title,
+      description,
+      price,
+      date,
+      totalSeats,
+      eventId,
+      userId
+    );
 
-        return res.status(200).json({
-            message: "Event updated successfully",
-            data: event,
-        });
-    } catch (error: any) {
-        return res.status(400).json({
-            message: error.message,
-        });
-    }
+    return res.status(200).json({
+      message: "Event updated successfully",
+      data: event,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      message: error.message,
+    });
+  }
 };
 
 export const deleteEventController = async (req: Request, res: Response) => {
-    try {
-        const eventId = Number(req.params.id);
+  try {
+    const eventId = Number(req.params.id);
 
-        if (!eventId) {
-            return res.status(400).json({
-                message: "Event ID is required",
-            });
-        }
-
-        const event = await deleteEvent(eventId);
-        return res.status(200).json({
-            message: "Event deleted successfully",
-            data: event,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Internal server error",
-        });
+    if (!eventId) {
+      return res.status(400).json({
+        message: "Event ID is required",
+      });
     }
+
+    const event = await deleteEvent(eventId);
+    return res.status(200).json({
+      message: "Event deleted successfully",
+      data: event,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 }
 
 

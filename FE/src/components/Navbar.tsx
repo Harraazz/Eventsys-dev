@@ -1,16 +1,39 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getAccount, becomeOrganizer } from "../service/api";
+import { getAccount, becomeOrganizer, getPoint } from "../service/api";
 
 export default function Navbar() {
+    const navigate = useNavigate();
     const location = useLocation();
     const [open, setOpen] = useState(false);
     const [account, setAccount] = useState<any>(null);
+    const [point, setPoint] = useState<any>(0);
+    const [hasLogin, setHasLogin] = useState<any>(false);
     const [isOpenOrganizer, setIsOpenOrganizer] = useState(false);
 
     useEffect(() => {
+        setHasLogin(!!localStorage.getItem("token"));
         fetchAccount();
+        fetchPoint();
     }, []);
+
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        setHasLogin(false); // 🔥 ini penting
+        navigate("/login");
+    };
+
+    const handleLogin = () => {
+        navigate("/login");
+    };
+
+    const fetchPoint = () => {
+        getPoint().then((data) => {
+            const totalPoint = data.data?.reduce((acc: number, p: any) => acc + p.amount, 0);
+            setPoint(totalPoint);
+        });
+    }
 
     const fetchAccount = () => {
         getAccount().then((data) => {
@@ -47,8 +70,8 @@ export default function Navbar() {
 
     console.log(account);
     const menu = [
-        { name: "Home", path: "/home" },
-        { name: "Dashboard", path: "/" },
+        { name: "Home", path: "/" },
+        { name: "Dashboard", path: "/dashboard" },
         { name: "Events", path: "/events" },
         { name: "Transactions", path: "/transactions" },
         // { name: "Users", path: "/users" },
@@ -83,7 +106,11 @@ export default function Navbar() {
                     account === null ? (
                         <h3 className="text-yellow-400 font-bold mb-5">Login terlebih dahulu</h3>
                     ) : (
-                        <h3 className="text-yellow-400 font-bold">{account?.email}||{account?.role}</h3>
+                        <div>
+                            <h3 className="text-yellow-400 font-bold">{account?.email}||{account?.role}</h3>
+                            <h3 className="text-yellow-400 font-bold">Your Referral Code: {account?.referralCode}</h3>
+                            <h3 className="text-yellow-400 font-bold">Your Balance: {point}</h3>
+                        </div>
                     )
                 }
 
@@ -95,6 +122,24 @@ export default function Navbar() {
                         Jadi Organizer
                     </button>
                 )}
+
+                {
+                    hasLogin ? (
+                        <button
+                            onClick={handleLogout}
+                            className="mt-3 mb-4 w-full bg-red-600 text-white py-1 rounded-lg text-sm font-semibold"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleLogin}
+                            className="mt-3 mb-4 w-full bg-green-600 text-white py-1 rounded-lg text-sm font-semibold"
+                        >
+                            Login
+                        </button>
+                    )
+                }
 
                 <div className="flex flex-col gap-2">
                     {menu.map((item) => (

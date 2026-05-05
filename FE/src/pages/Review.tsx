@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { createReviewService } from "../service/review";
+
 
 export default function EventReview({
   eventId,
@@ -33,27 +35,12 @@ export default function EventReview({
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token"); // 🔥 WAJIB
-
-      const res = await fetch("http://localhost:3000/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // 🔥 INI KUNCI
-        },
-        body: JSON.stringify({
-          eventId,
-          rating,
-          comment,
-        }),
+      // 🔥 pakai service, ga perlu fetch manual lagi
+      await createReviewService({
+        eventId,
+        rating,
+        comment,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert("Error: " + data.message);
-        return;
-      }
 
       alert("🎉 Review berhasil dikirim!");
 
@@ -64,7 +51,12 @@ export default function EventReview({
 
     } catch (err: any) {
       console.error(err);
-      alert("Failed connect to server");
+
+      // ambil error dari backend kalau ada
+      const message =
+        err.response?.data?.message || "Failed create review";
+
+      alert("Error: " + message);
     } finally {
       setLoading(false);
     }

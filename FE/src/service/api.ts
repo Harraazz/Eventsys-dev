@@ -62,6 +62,11 @@ export const deleteEvent = async (id: number) => {
 
 
 export const getEventById = async (id: number) => {
-  const res = await api.get(`/events/${id}`);
-  return res.data;
+    const res = await api.get(`/events/${id}`);
+    return res.data;
 };
+
+export const getPoint = async () => {
+    const res = await api.get(`/point`);
+    return res.data;
+}
