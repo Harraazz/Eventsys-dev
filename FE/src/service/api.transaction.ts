@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
 
 
 export const getTransactions = async () => {
-    const res = await api.get("/Transactions-list");
+    const res = await api.get("/transaction-list");
     return res.data;
 };
 

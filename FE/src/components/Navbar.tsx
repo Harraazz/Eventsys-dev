@@ -68,14 +68,22 @@ export default function Navbar() {
         }
     };
 
-    console.log(account);
-    const menu = [
+    const menuCustomer = [
         { name: "Home", path: "/" },
+        { name: "Profile", path: "/profile" },
+        { name: "History", path: "/transactions" },
+    ];
+
+    const menuOrganizer = [
         { name: "Dashboard", path: "/dashboard" },
         { name: "Events", path: "/events" },
         { name: "Transactions", path: "/transactions" },
-        // { name: "Users", path: "/users" },
     ];
+
+    const menu =
+        account?.role === "ORGANIZER"
+            ? menuOrganizer
+            : menuCustomer;
 
     return (
         <>
