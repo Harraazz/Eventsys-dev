@@ -5,8 +5,8 @@ import { becomeOrganizer } from "../controllers/organizer.controller";
 import { pointController } from "../controllers/point.controller";
 import { createTransactionController, getListTransaction } from "../controllers/transaction.controller";
 import { verifyToken } from "../middleware/auth.middleware";
-
-import { createReviewController, getReviewsController} from "../controllers/review.controller";
+import { dashboardController } from "../controllers/dashboard.controller";
+import { createReviewController, getReviewsController } from "../controllers/review.controller";
 import { getEventByIdController } from "../controllers/event.controller";
 
 const router = express.Router();
@@ -24,11 +24,14 @@ router.put("/event/:id", verifyToken, updateEventController);
 router.delete("/event/:id", verifyToken, deleteEventController);
 
 
-
+// Reviews
 router.get("/event/:id", getEventByIdController);
 router.get("/reviews/:eventId", getReviewsController);
 router.post("/reviews", verifyToken, createReviewController);
 
+// Dashboard
+router.get("/dashboard", verifyToken, dashboardController);
 
 
+router.get("/transaction-list", verifyToken, getListTransaction);
 export default router;

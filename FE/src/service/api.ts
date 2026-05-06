@@ -70,3 +70,8 @@ export const getPoint = async () => {
     const res = await api.get(`/point`);
     return res.data;
 }
+
+export const getDashboard = async () => {
+    const res = await api.get("/dashboard");
+    return res.data;
+};

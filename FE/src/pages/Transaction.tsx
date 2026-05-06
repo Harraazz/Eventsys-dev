@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getTransactions, createTransaction, deleteTransaction, updateTransaction } from "../service/api.transaction";
-import { getEvents } from "../service/api";
+import { getEvents, getAccount } from "../service/api";
 
 export default function Events() {
+    const [account, setAccount] = useState<any>(null);
     const [eventList, setEventList] = useState<any[]>([]);
     const [transactions, setTransactions] = useState([]);
     const [isEdit, setIsEdit] = useState(false);
@@ -11,6 +12,7 @@ export default function Events() {
     useEffect(() => {
         fetchEventList();
         fetchTransactionList();
+        fetchAccount();
     }, []);
 
     const fetchEventList = () => {
@@ -22,6 +24,12 @@ export default function Events() {
     const fetchTransactionList = () => {
         getTransactions().then((res) => {
             setTransactions(res.data);
+        });
+    };
+
+    const fetchAccount = () => {
+        getAccount().then((res) => {
+            setAccount(res.data);
         });
     };
 
@@ -96,7 +104,7 @@ export default function Events() {
             {/* 🔥 HEADER */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-yellow-400">
-                    Transactions
+                    {account?.role === "CUSTOMER" ? "Purchase History" : "Transactions"}
                 </h1>
 
                 {/* <button
@@ -120,7 +128,9 @@ export default function Events() {
                                 <th className="p-3 text-left">Quantity</th>
                                 <th className="p-3 text-left">Total</th>
                                 <th className="p-3 text-left">Date</th>
-                                <th className="p-3 text-left">Attendance</th>
+                                {account?.role === "ORGANIZER" && (
+                                    <th className="p-3 text-left">User</th>
+                                )}
                                 <th className="p-3 text-center">Action</th>
                             </tr>
                         </thead>
@@ -152,24 +162,28 @@ export default function Events() {
                                         {new Date(tx.createdAt).toLocaleDateString()}
                                     </td>
 
-                                    <td className="p-3">
-                                        {tx.user?.email}
-                                    </td>
+                                    {account?.role === "ORGANIZER" && (
+                                        <td className="p-3">{tx.user?.email}</td>
+                                    )}
 
                                     <td className="p-3 flex gap-2 justify-center">
-                                        <button
-                                            onClick={() => handleEdit(tx)}
-                                            className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-white text-xs"
-                                        >
-                                            Edit
-                                        </button>
+                                        {account?.role === "ORGANIZER" && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleEdit(tx)}
+                                                    className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-white text-xs"
+                                                >
+                                                    Edit
+                                                </button>
 
-                                        <button
-                                            onClick={() => handleDelete(tx.id)}
-                                            className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white text-xs"
-                                        >
-                                            Delete
-                                        </button>
+                                                <button
+                                                    onClick={() => handleDelete(tx.id)}
+                                                    className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white text-xs"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
