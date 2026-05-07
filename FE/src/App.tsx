@@ -10,6 +10,7 @@ import "./index.css";
 import Home from "./pages/Home";
 import EventDetail from "./pages/EventDetail";
 import CreateEvent from "./pages/CreateEvent";
+import Checkout from "./pages/Checkout";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/events/:id" element={<EventDetail />} />
           <Route path="/create-event" element={<CreateEvent />} />
+          <Route path="/checkout/:id" element={<Checkout />} />
         </Route>
       </Routes>
     </BrowserRouter>

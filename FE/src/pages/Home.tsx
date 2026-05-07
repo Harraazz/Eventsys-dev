@@ -13,17 +13,17 @@ export default function Home() {
 
   // const navigate = useNavigate();
 
-  // pagination
+  // PAGINATION
   const [page, setPage] = useState(1);
   const perPage = 6;
 
-  // ✅ FIXED FETCH
+  // FETCH
   useEffect(() => {
     getEvents()
       .then((res) => {
         console.log("EVENTS:", res);
 
-        // 🔥 ambil dari res.data (karena backend pakai { data: [] })
+        
         const safeData = Array.isArray(res?.data) ? res.data : [];
 
         setEvents(safeData);
@@ -36,7 +36,7 @@ export default function Home() {
       });
   }, []);
 
-  // debounce search
+  // DEBOUNCE
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -45,7 +45,7 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // filter logic
+  // FILTER
   useEffect(() => {
     let data = Array.isArray(events) ? [...events] : [];
 
@@ -69,7 +69,7 @@ export default function Home() {
     setPage(1);
   }, [debouncedSearch, category, location, events]);
 
-  // pagination
+  // PAGINATION
   const totalPages = Math.ceil(filtered.length / perPage);
 
   const paginated = Array.isArray(filtered)
@@ -77,70 +77,77 @@ export default function Home() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">🎟️ Events</h1>
+    <div className="min-h-screen bg-gray-950 text-white py-6 px-4">
+      <div className="max-w-7xl mx-auto">
+        
+        
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-yellow-400">
+          🎟️ Events
+        </h1>
 
-      {/* SEARCH */}
-      <input
-        type="text"
-        placeholder="Search events..."
-        className="w-full p-2 mb-4 border rounded"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      {/* FILTER */}
-      <div className="flex gap-4 mb-6">
+        
         <input
-          placeholder="Filter location"
-          className="p-2 border rounded"
-          onChange={(e) => setLocation(e.target.value)}
+          type="text"
+          placeholder="Search events..."
+          className="w-full p-3 mb-4 rounded-xl bg-gray-800 text-white outline-none border border-gray-800 focus:border-yellow-400 transition"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
 
-        <select
-          className="p-2 border rounded"
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">All Category</option>
-          <option value="music">Music</option>
-          <option value="fanmeet">Fanmeet</option>
-        </select>
-      </div>
+        
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <input
+            placeholder="Filter location"
+            className="flex-1 p-3 rounded-xl bg-gray-800 text-white outline-none border border-gray-800 focus:border-yellow-400 transition"
+            onChange={(e) => setLocation(e.target.value)}
+          />
 
-      {/* EVENTS */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {paginated.length > 0 ? (
-          paginated.map((e: any) => (
-            <EventCard key={e.id} event={e} />
-          ))
-        ) : (
-          <p className="text-center col-span-3 text-gray-500">
-            No events found
-          </p>
-        )}
-      </div>
+          <select
+            className="w-full md:w-56 p-3 rounded-xl bg-gray-800 text-white outline-none border border-gray-800 focus:border-yellow-400 transition cursor-pointer"
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">All Category</option>
+            <option value="music">Music</option>
+            <option value="fanmeet">Fanmeet</option>
+          </select>
+        </div>
 
-      {/* PAGINATION */}
-      <div className="flex justify-center mt-6 gap-2">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-          className="px-3 py-1 bg-gray-300 rounded"
-        >
-          Prev
-        </button>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {paginated.length > 0 ? (
+            paginated.map((e: any) => (
+              <EventCard key={e.id} event={e} />
+            ))
+          ) : (
+            <p className="text-center col-span-3 text-gray-500">
+              No events found
+            </p>
+          )}
+        </div>
 
-        <span className="px-3 py-1">
-          {page} / {totalPages || 1}
-        </span>
+        
+        <div className="flex justify-center items-center mt-8 gap-3">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition disabled:opacity-40"
+          >
+            Prev
+          </button>
 
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage(page + 1)}
-          className="px-3 py-1 bg-gray-300 rounded"
-        >
-          Next
-        </button>
+          <span className="px-3 py-1 text-sm text-gray-400">
+            {page} / {totalPages || 1}
+          </span>
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+
       </div>
     </div>
   );
