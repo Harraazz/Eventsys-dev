@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma";
 
-// 🔥 CREATE REVIEW
+
 
 export const createReviewService = async (
   userId: number,
@@ -13,18 +13,16 @@ export const createReviewService = async (
       userId,
       eventId,
       rating,
-      comment: comment ?? "", // ✅ pakai input user
+      comment: comment ?? "", 
     },
   });
 };
 
-// 🔥 GET REVIEWS BY EVENT
+
 export const getReviewsByEvent = async (eventId: number) => {
   return prisma.review.findMany({
     where: { eventId },
     orderBy: { createdAt: "desc" },
-
-    // 🔥 BONUS: sekalian ambil user (biar nanti bisa nampilin nama)
     include: {
       user: {
         select: {
