@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createReviewService } from "../service/review";
 
-
 export default function EventReview({
   eventId,
   onSuccess,
@@ -35,14 +34,13 @@ export default function EventReview({
     try {
       setLoading(true);
 
-      // 🔥 pakai service, ga perlu fetch manual lagi
       await createReviewService({
         eventId,
         rating,
         comment,
       });
 
-      alert("🎉 Review berhasil dikirim!");
+      alert("Review submitted!");
 
       if (onSuccess) onSuccess();
 
@@ -52,7 +50,6 @@ export default function EventReview({
     } catch (err: any) {
       console.error(err);
 
-      // ambil error dari backend kalau ada
       const message =
         err.response?.data?.message || "Failed create review";
 
@@ -63,10 +60,17 @@ export default function EventReview({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white shadow p-4 rounded mt-6">
-      <h2 className="font-bold mb-3">Leave a Review</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-gray-900 border border-gray-800 p-4 sm:p-6 rounded-xl mt-6 text-white"
+    >
+      
+      <h2 className="font-bold text-base sm:text-lg text-yellow-400 mb-4">
+        Leave a Review
+      </h2>
 
-      <div className="flex text-3xl mb-2">
+      
+      <div className="flex text-2xl sm:text-3xl mb-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             type="button"
@@ -79,18 +83,23 @@ export default function EventReview({
         ))}
       </div>
 
-      <p className="text-sm mb-3 text-gray-600">{getLabel()}</p>
+      
+      <p className="text-xs sm:text-sm mb-3 text-gray-400">
+        {getLabel()}
+      </p>
 
+      
       <textarea
         placeholder="Write your experience..."
-        className="border p-2 w-full mb-3 rounded"
+        className="p-2 rounded bg-gray-800 text-white w-full mb-3 text-sm sm:text-base"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
 
+      
       <button
         disabled={loading}
-        className="bg-green-600 text-white px-4 py-2 rounded w-full hover:bg-green-700 disabled:bg-gray-400"
+        className="w-full bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 text-sm sm:text-base"
       >
         {loading ? "Submitting..." : "Submit Review"}
       </button>

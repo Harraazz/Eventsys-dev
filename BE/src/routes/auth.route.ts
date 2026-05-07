@@ -8,6 +8,8 @@ import { verifyToken } from "../middleware/auth.middleware";
 import { dashboardController } from "../controllers/dashboard.controller";
 import { createReviewController, getReviewsController } from "../controllers/review.controller";
 import { getEventByIdController } from "../controllers/event.controller";
+import { createCheckoutController } from "../controllers/checkout.controller";
+import { getUserCoupons } from "../controllers/coupon.controller";
 
 const router = express.Router();
 // auth
@@ -28,6 +30,8 @@ router.delete("/event/:id", verifyToken, deleteEventController);
 router.get("/event/:id", getEventByIdController);
 router.get("/reviews/:eventId", getReviewsController);
 router.post("/reviews", verifyToken, createReviewController);
+router.post("/checkout", verifyToken, createCheckoutController);
+router.get("/coupon/me", verifyToken, getUserCoupons);
 
 // Dashboard
 router.get("/dashboard", verifyToken, dashboardController);
