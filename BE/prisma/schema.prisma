@@ -39,7 +39,6 @@ model User {
 
   createdAt     DateTime @default(now())
 }
-
 model Organizer {
   id        Int      @id @default(autoincrement())
   name      String

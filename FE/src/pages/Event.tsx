@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { getEvents, createEvent, updateEvent, deleteEvent } from "../service/api";
 
 import { useNavigate } from "react-router-dom";
+
+
+
 export default function Events() {
 
 
@@ -234,6 +237,15 @@ export default function Events() {
                     </div>
                 </div>
             )}
+
+
+
+
+
+
+
+
+
         </div>
     );
 }

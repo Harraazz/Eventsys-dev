@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEvents } from "../service/api";
 import EventCard from "../components/EventCard";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [events, setEvents] = useState<any[]>([]);
@@ -11,7 +11,7 @@ export default function Home() {
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // pagination
   const [page, setPage] = useState(1);
