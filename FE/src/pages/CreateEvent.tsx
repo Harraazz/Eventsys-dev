@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { createEvent } from "../service/api";
 
 export default function CreateEvent() {
   const [form, setForm] = useState({
@@ -15,33 +15,23 @@ export default function CreateEvent() {
   const [isPaid, setIsPaid] = useState(false);
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const token = localStorage.getItem("token");
+  try {
+    await createEvent({
+      ...form,
+      price: isPaid ? Number(form.price) : 0,
+      totalSeats: Number(form.totalSeats),
+    });
 
-      const res = await axios.post(
-        "http://localhost:3000/api/create-event",
-        {
-          ...form,
-          price: isPaid ? Number(form.price) : 0,
-          totalSeats: Number(form.totalSeats),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    alert("Event created successfully!");
+    window.location.reload();
+  } catch (err: any) {
+    console.error(err.response?.data || err.message);
 
-      alert("Event created successfully!");
-      window.location.reload();
-
-    } catch (err: any) {
-      console.error(err.response?.data || err.message);
-      alert(err.response?.data?.message || "Failed connect to server");
-    }
-  };
+    alert(err.response?.data?.message || "Failed connect to server");
+  }
+};
 
   return (
     <form

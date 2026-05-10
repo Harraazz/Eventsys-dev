@@ -26,7 +26,7 @@ router.put("/event/:id", verifyToken, updateEventController);
 router.delete("/event/:id", verifyToken, deleteEventController);
 
 
-// Reviews
+
 router.get("/event/:id", getEventByIdController);
 router.get("/reviews/:eventId", getReviewsController);
 router.post("/reviews", verifyToken, createReviewController);

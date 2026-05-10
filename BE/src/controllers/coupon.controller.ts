@@ -1,22 +1,11 @@
 import { Request, Response } from "express";
-import prisma from "../lib/prisma";
+import { getCouponsByUser } from "../services/coupon.service";
 
 export const getUserCoupons = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
 
-    const coupons = await prisma.coupon.findMany({
-      where: {
-        userId,
-        isUsed: false,
-        expiresAt: {
-          gte: new Date(),
-        },
-      },
-      orderBy: {
-        expiresAt: "asc",
-      },
-    });
+    const coupons = await getCouponsByUser(userId);
 
     return res.json({
       data: coupons,

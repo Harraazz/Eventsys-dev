@@ -126,7 +126,7 @@ export default function Events() {
                                 <th className="p-3 text-left">Event</th>
                                 <th className="p-3 text-left">Price</th>
                                 <th className="p-3 text-left">Quantity</th>
-                                <th className="p-3 text-left">Total</th>
+                                <th className="p-3 text-left">Final Price</th>
                                 <th className="p-3 text-left">Date</th>
                                 {account?.role === "ORGANIZER" && (
                                     <th className="p-3 text-left">User</th>
@@ -155,7 +155,7 @@ export default function Events() {
                                     </td>
 
                                     <td className="p-3">
-                                        Rp {tx.totalPrice}
+                                        Rp {tx.finalPrice}
                                     </td>
 
                                     <td className="p-3">

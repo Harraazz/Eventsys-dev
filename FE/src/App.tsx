@@ -12,15 +12,15 @@ import EventDetail from "./pages/EventDetail";
 import CreateEvent from "./pages/CreateEvent";
 import Checkout from "./pages/Checkout";
 
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ❌ TANPA NAVBAR */}
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* ✔ PAKAI NAVBAR */}
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/events" element={<Events />} />

@@ -1,13 +1,18 @@
 import { Request, Response } from "express";
-import { createEvent, getListEvent, updateEvent, deleteEvent } from "../services/event.service";
-
-import prisma from "../lib/prisma";
+import { createEvent, getListEvent, updateEvent, deleteEvent, getOrganizerByUserId, getEventById } from "../services/event.service";
 
 export const createEventController = async (req: Request, res: Response) => {
   try {
-    const { title, description, price, date, totalSeats, location, category } = req.body;
+    const {
+      title,
+      description,
+      price,
+      date,
+      totalSeats,
+      location,
+      category,
+    } = req.body;
 
-    // ✅ VALIDASI (fix price + field tambahan)
     if (
       !title ||
       !description ||
@@ -22,7 +27,6 @@ export const createEventController = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ AMANIN USER
     const user = (req as any).user;
 
     if (!user) {
@@ -33,10 +37,7 @@ export const createEventController = async (req: Request, res: Response) => {
 
     const userId = user.id;
 
-    // 🔥 cari organizer milik user
-    const organizer = await prisma.organizer.findFirst({
-      where: { userId },
-    });
+    const organizer = await getOrganizerByUserId(userId);
 
     if (!organizer) {
       return res.status(403).json({
@@ -44,7 +45,6 @@ export const createEventController = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ KIRIM KE SERVICE (tambah param baru)
     const event = await createEvent(
       title,
       description,
@@ -52,8 +52,8 @@ export const createEventController = async (req: Request, res: Response) => {
       date,
       totalSeats,
       organizer.id,
-      location,   // 🔥 tambah ini
-      category    // 🔥 tambah ini
+      location,
+      category
     );
 
     return res.status(201).json({
@@ -61,10 +61,8 @@ export const createEventController = async (req: Request, res: Response) => {
       data: event,
     });
   } catch (error: any) {
-    console.log("❌ CREATE EVENT ERROR:", error);
-
     return res.status(500).json({
-      message: error.message || "Internal server error", // 🔥 biar keliatan error asli
+      message: error.message || "Internal server error",
     });
   }
 };
@@ -135,14 +133,11 @@ export const deleteEventController = async (req: Request, res: Response) => {
   }
 }
 
-
 export const getEventByIdController = async (req: Request, res: Response) => {
   try {
     const eventId = Number(req.params.id);
 
-    const event = await prisma.event.findUnique({
-      where: { id: eventId },
-    });
+    const event = await getEventById(eventId);
 
     if (!event) {
       return res.status(404).json({
@@ -153,7 +148,7 @@ export const getEventByIdController = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "Event fetched successfully",
-      data: event, // ✅ konsisten
+      data: event,
     });
   } catch (error) {
     return res.status(500).json({

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createReviewService } from "../service/review";
+import { createReviewService } from "../service/api";
 
 export default function EventReview({
   eventId,
@@ -69,7 +69,6 @@ export default function EventReview({
         Leave a Review
       </h2>
 
-      
       <div className="flex text-2xl sm:text-3xl mb-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -82,13 +81,11 @@ export default function EventReview({
           </button>
         ))}
       </div>
-
       
       <p className="text-xs sm:text-sm mb-3 text-gray-400">
         {getLabel()}
       </p>
 
-      
       <textarea
         placeholder="Write your experience..."
         className="p-2 rounded bg-gray-800 text-white w-full mb-3 text-sm sm:text-base"
@@ -96,7 +93,6 @@ export default function EventReview({
         onChange={(e) => setComment(e.target.value)}
       />
 
-      
       <button
         disabled={loading}
         className="w-full bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 text-sm sm:text-base"

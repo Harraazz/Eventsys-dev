@@ -1,8 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import api from "../service/api";
-import { createCheckout } from "../service/checkout.service";
-import { getMyCoupons } from "../service/coupon.service";
+import { createCheckout, getMyCoupons, getEventById, getPoint } from "../service/api";
 
 export default function Checkout() {
   const { id } = useParams();
@@ -15,11 +13,12 @@ export default function Checkout() {
   const [couponId, setCouponId] = useState<number | "">("");
   const [coupons, setCoupons] = useState<any[]>([]);
   const [usePoint, setUsePoint] = useState(false);
-
+  const [userPoint, setUserPoint] = useState(0);
+  
   const fetchEvent = async () => {
     try {
-      const res = await api.get(`/event/${eventId}`);
-      setEvent(res.data.data);
+      const data = await getEventById(eventId);
+      setEvent(data);
     } catch (err) {
       console.error("FETCH EVENT ERROR:", err);
     }
@@ -34,9 +33,22 @@ export default function Checkout() {
     }
   };
 
+  const fetchPoint = async () => {
+    try {
+      const data = await getPoint();
+
+      console.log("POINT DATA:", data);
+
+      setUserPoint(data.data[0]?.amount || 0);
+    } catch (err) {
+      console.error("Point error:", err);
+    }
+  };
+
   useEffect(() => {
     if (eventId) fetchEvent();
     fetchCoupons();
+    fetchPoint();
   }, [eventId]);
 
   const handlePayment = async () => {
@@ -62,14 +74,25 @@ export default function Checkout() {
 
   const totalPrice = event.price * quantity;
 
+  const selectedCoupon = coupons.find((c) => c.id === couponId);
+
+  const discount = selectedCoupon
+    ? (totalPrice * selectedCoupon.discount) / 100
+    : 0;
+
+  const pointDiscount = usePoint ? userPoint : 0;
+
+  const finalPrice = Math.max(
+    totalPrice - discount - pointDiscount,
+    0
+  );
+
   return (
     <div className="text-white p-4 sm:p-6 max-w-xl mx-auto">
-      
       <h1 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4 sm:mb-6">
         Checkout
       </h1>
 
-      
       <div className="bg-gray-900 p-3 sm:p-4 rounded-xl mb-4 border border-gray-800">
         <h2 className="font-bold text-base sm:text-lg text-white mb-1">
           {event.title}
@@ -87,7 +110,6 @@ export default function Checkout() {
         </p>
       </div>
 
-      
       <div className="flex flex-col gap-3 sm:gap-4">
         
         <div>
@@ -103,7 +125,6 @@ export default function Checkout() {
           />
         </div>
 
-        
         <div>
           <label className="text-xs sm:text-sm text-gray-400">
             Select Coupon
@@ -126,7 +147,6 @@ export default function Checkout() {
           </select>
         </div>
 
-        
         <div
           onClick={() => setUsePoint(!usePoint)}
           className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition
@@ -154,7 +174,6 @@ export default function Checkout() {
           </div>
         </div>
 
-        
         <div>
           <label className="text-xs sm:text-sm text-gray-400">
             Payment Method
@@ -170,14 +189,35 @@ export default function Checkout() {
         </div>
       </div>
 
-      
-      <div className="mt-5 sm:mt-6 p-3 sm:p-4 bg-gray-900 rounded-xl border border-gray-800">
-        <p className="font-bold text-base sm:text-lg">
-          Total:{" "}
+      <div className="mt-5 sm:mt-6 p-3 sm:p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-2">
+
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Subtotal</span>
+          <span>Rp {totalPrice.toLocaleString()}</span>
+        </div>
+
+        {discount > 0 && (
+          <div className="flex justify-between text-sm text-green-400">
+            <span>Coupon Discount</span>
+            <span>- Rp {discount.toLocaleString()}</span>
+          </div>
+        )}
+
+        {usePoint && (
+          <div className="flex justify-between text-sm text-green-400">
+            <span>Point Used</span>
+            <span>- Rp {pointDiscount.toLocaleString()}</span>
+          </div>
+        )}
+
+        <div className="border-t border-gray-700 pt-2 flex justify-between font-bold text-base sm:text-lg">
+          <span>Total Payment</span>
+
           <span className="text-yellow-400">
-            Rp {totalPrice.toLocaleString()}
+            Rp {finalPrice.toLocaleString()}
           </span>
-        </p>
+        </div>
+
       </div>
 
       

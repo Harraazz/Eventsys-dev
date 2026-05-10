@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import prisma from "../lib/prisma";
-import { createReviewService } from "../services/review.service";
+import { createReviewService,  getReviewsService } from "../services/review.service";
 
-// CREATE
+
 export const createReviewController = async (req: Request, res: Response) => {
   try {
     const { rating, comment } = req.body;
@@ -10,8 +9,6 @@ export const createReviewController = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id; 
     const eventId = Number(req.body.eventId);
 
-
-    //  VALIDASI
     if (rating === undefined || rating === null) {
       return res.status(400).json({
         message: "Rating is required",
@@ -36,7 +33,6 @@ export const createReviewController = async (req: Request, res: Response) => {
       });
     }
 
-    // KIRIM KE SERVICE
     const review = await createReviewService(
       userId,
       eventId,
@@ -46,7 +42,6 @@ export const createReviewController = async (req: Request, res: Response) => {
 
     return res.status(201).json(review);
   } catch (error: any) {
-    console.log("ERROR CREATE REVIEW:", error);
 
     if (error.code === "P2002") {
       return res.status(400).json({
@@ -59,7 +54,8 @@ export const createReviewController = async (req: Request, res: Response) => {
     });
   }
 };
-// GET REVIEWS
+
+
 export const getReviewsController = async (req: Request, res: Response) => {
   try {
     const eventId = Number(req.params.eventId);
@@ -70,28 +66,11 @@ export const getReviewsController = async (req: Request, res: Response) => {
       });
     }
 
-   
+    const reviews = await getReviewsService(eventId);
 
-    const reviews = await prisma.review.findMany({
-      where: { eventId },
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    
-
-    res.json(reviews);
+    return res.json(reviews);
   } catch (error) {
-    console.log("ERROR GET REVIEWS:", error);
-
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed get reviews",
     });
   }

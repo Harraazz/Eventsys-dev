@@ -61,9 +61,9 @@ export const deleteEvent = async (id: number) => {
 }
 
 
-export const getEventById = async (id: number) => {
-    const res = await api.get(`/events/${id}`);
-    return res.data;
+export const getEventById = async (eventId: number) => {
+    const res = await api.get(`/event/${eventId}`);
+    return res.data.data;
 };
 
 export const getPoint = async () => {
@@ -76,4 +76,55 @@ export const getDashboard = async () => {
     return res.data;
 };
 
-export default api;
+export const getMyCoupons = async () => {
+  try {
+    const res = await api.get("/coupon/me");
+
+    return res.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed get coupons"
+    );
+  }
+};
+
+export const createReviewService = async (
+    data: { eventId: number; rating: number; comment: string }
+) => {
+    const res = await api.post(`/reviews`, data);
+    return res.data;
+};
+
+export const getReviewsByEventService = async (eventId: number) => {
+    const res = await api.get(`/reviews/${eventId}`);
+    return res.data;
+};
+
+export const createCheckout = async ({
+  eventId,
+  quantity,
+  couponId,
+  usePoint,
+}: {
+  eventId: number;
+  quantity: number;
+  couponId?: number;
+  usePoint?: boolean;
+}) => {
+  try {
+    const res = await api.post("/checkout", {
+      eventId,
+      quantity,
+      ...(couponId && { couponId }),
+      ...(usePoint && { usePoint }),
+    });
+
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Checkout gagal"
+    );
+  }
+};
+
+

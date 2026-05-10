@@ -64,18 +64,6 @@ export default function Events() {
         });
     };
 
-    const handleCreate = () => {
-        setIsEdit(false);
-        setForm({
-            title: "",
-            description: "",
-            price: "",
-            date: "",
-            totalSeats: "",
-        });
-        setIsOpen(true);
-    };
-
     const handleSubmit = async () => {
         try {
             if (isEdit) {

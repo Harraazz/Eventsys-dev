@@ -8,7 +8,7 @@ export const createCheckout = async (
   usePoint?: boolean
 ) => {
   return await prisma.$transaction(async (tx) => {
-    // GET EVENT
+    
     const event = await tx.event.findUnique({
       where: { id: eventId },
     });
@@ -17,16 +17,13 @@ export const createCheckout = async (
       throw new Error("Event not found");
     }
 
-    // CEK SEAT
     if (event.availableSeats < quantity) {
       throw new Error("Seat not available");
     }
 
-    
     let totalPrice = event.price * quantity;
     let finalPrice = totalPrice;
 
-    // APPLY COUPON
     if (couponId) {
       const coupon = await tx.coupon.findFirst({
         where: {
@@ -43,10 +40,8 @@ export const createCheckout = async (
         throw new Error("Coupon not valid");
       }
 
-      // DISCOUNT
       finalPrice -= (finalPrice * coupon.discount) / 100;
 
-      // COUPON USED
       await tx.coupon.update({
         where: { id: couponId },
         data: {
@@ -55,7 +50,7 @@ export const createCheckout = async (
       });
     }
 
-    // APPLY POINT
+    
     if (usePoint) {
       const points = await tx.point.findMany({
         where: {
@@ -72,13 +67,11 @@ export const createCheckout = async (
 
       finalPrice -= usedPoint;
 
-      
       await tx.point.deleteMany({
         where: { userId },
       });
     }
-
-    // CREATE TRANSACTION
+    
     const trx = await tx.transaction.create({
       data: {
         userId,
@@ -89,7 +82,6 @@ export const createCheckout = async (
       },
     });
 
-    // REDUCE SEAT
     await tx.event.update({
       where: { id: eventId },
       data: {

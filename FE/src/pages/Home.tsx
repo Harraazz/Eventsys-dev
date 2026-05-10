@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getEvents } from "../service/api";
 import EventCard from "../components/EventCard";
-import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [events, setEvents] = useState<any[]>([]);
@@ -10,20 +9,15 @@ export default function Home() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
-
-  const navigate = useNavigate();
-
-  // PAGINATION
+  
   const [page, setPage] = useState(1);
   const perPage = 6;
 
-  // FETCH
   useEffect(() => {
     getEvents()
       .then((res) => {
         console.log("EVENTS:", res);
 
-        
         const safeData = Array.isArray(res?.data) ? res.data : [];
 
         setEvents(safeData);
@@ -36,7 +30,6 @@ export default function Home() {
       });
   }, []);
 
-  // DEBOUNCE
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -45,7 +38,6 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // FILTER
   useEffect(() => {
     let data = Array.isArray(events) ? [...events] : [];
 
@@ -69,7 +61,6 @@ export default function Home() {
     setPage(1);
   }, [debouncedSearch, category, location, events]);
 
-  // PAGINATION
   const totalPages = Math.ceil(filtered.length / perPage);
 
   const paginated = Array.isArray(filtered)
@@ -79,13 +70,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-950 text-white py-6 px-4">
       <div className="max-w-7xl mx-auto">
-        
-        
         <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-yellow-400">
           🎟️ Events
         </h1>
 
-        
         <input
           type="text"
           placeholder="Search events..."
@@ -94,7 +82,6 @@ export default function Home() {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
             placeholder="Filter location"
@@ -107,12 +94,11 @@ export default function Home() {
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="">All Category</option>
-            <option value="music">Music</option>
-            <option value="fanmeet">Fanmeet</option>
+            <option value="Concert">Concert</option>
+            <option value="Fanmeet">Fanmeet</option>
           </select>
         </div>
 
-        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {paginated.length > 0 ? (
             paginated.map((e: any) => (
@@ -125,7 +111,6 @@ export default function Home() {
           )}
         </div>
 
-        
         <div className="flex justify-center items-center mt-8 gap-3">
           <button
             disabled={page === 1}

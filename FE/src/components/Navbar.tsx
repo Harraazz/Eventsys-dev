@@ -19,10 +19,16 @@ export default function Navbar() {
 
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        setHasLogin(false); // 🔥 ini penting
-        navigate("/login");
-    };
+    localStorage.removeItem("token");
+
+    setHasLogin(false);
+
+    setAccount(null);
+
+    setPoint(0);
+
+    navigate("/");
+};
 
     const handleLogin = () => {
         navigate("/login");
@@ -70,11 +76,11 @@ export default function Navbar() {
 
     const menuCustomer = [
         { name: "Home", path: "/" },
-        { name: "Profile", path: "/profile" },
         { name: "History", path: "/transactions" },
     ];
 
     const menuOrganizer = [
+        { name: "Home", path: "/" },
         { name: "Dashboard", path: "/dashboard" },
         { name: "Events", path: "/events" },
         { name: "Transactions", path: "/transactions" },
@@ -110,17 +116,27 @@ export default function Navbar() {
                 <h2 className="text-yellow-400 text-xl font-bold mb-6">
                     LiteRate
                 </h2>
-                {
-                    account === null ? (
-                        <h3 className="text-yellow-400 font-bold mb-5">Login terlebih dahulu</h3>
-                    ) : (
-                        <div>
-                            <h3 className="text-yellow-400 font-bold">{account?.email}||{account?.role}</h3>
-                            <h3 className="text-yellow-400 font-bold">Your Referral Code: {account?.referralCode}</h3>
-                            <h3 className="text-yellow-400 font-bold">Your Balance: {point}</h3>
-                        </div>
-                    )
-                }
+               {
+                hasLogin && account ? (
+                    <div>
+                        <h3 className="text-yellow-400 font-bold">
+                            {account?.email} || {account?.role}
+                        </h3>
+
+                        <h3 className="text-yellow-400 font-bold">
+                            Your Referral Code: {account?.referralCode}
+                        </h3>
+
+                        <h3 className="text-yellow-400 font-bold">
+                            Your Balance: {point}
+                        </h3>
+                    </div>
+                ) : (
+                    <h3 className="text-yellow-400 font-bold mb-5">
+                        Login terlebih dahulu
+                    </h3>
+                )
+            }
 
                 {account?.role === "CUSTOMER" && (
                     <button
@@ -131,23 +147,32 @@ export default function Navbar() {
                     </button>
                 )}
 
-                {
-                    hasLogin ? (
-                        <button
-                            onClick={handleLogout}
-                            className="mt-3 mb-4 w-full bg-red-600 text-white py-1 rounded-lg text-sm font-semibold"
-                        >
-                            Logout
-                        </button>
-                    ) : (
+            {
+                hasLogin ? (
+                    <button
+                        onClick={handleLogout}
+                        className="mt-3 mb-4 w-full bg-red-600 text-white py-2 rounded-lg text-sm font-semibold"
+                    >
+                        Logout
+                    </button>
+                ) : (
+                    <div className="flex flex-col gap-2 mt-3 mb-4">
                         <button
                             onClick={handleLogin}
-                            className="mt-3 mb-4 w-full bg-green-600 text-white py-1 rounded-lg text-sm font-semibold"
+                            className="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-semibold"
                         >
                             Login
                         </button>
-                    )
-                }
+
+                        <button
+                            onClick={() => navigate("/register")}
+                            className="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-semibold"
+                        >
+                            Register
+                        </button>
+                    </div>
+                )
+            }
 
                 <div className="flex flex-col gap-2">
                     {menu.map((item) => (

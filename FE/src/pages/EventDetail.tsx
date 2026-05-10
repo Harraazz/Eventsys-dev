@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { getEventById, getReviewsByEventService } from "../service/api";
 import EventReview from "./Review";
 
 export default function EventDetail() {
@@ -13,24 +14,23 @@ export default function EventDetail() {
 
   const fetchEvent = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/event/${eventId}`);
-      const data = await res.json();
-      setEvent(data.data);
+      const data = await getEventById(eventId);
+      setEvent(data);
     } catch (err) {
       console.error("FETCH EVENT ERROR:", err);
     }
   };
 
   const fetchReviews = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/reviews/${eventId}`);
-      const data = await res.json();
-      setReviews(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("FETCH REVIEW ERROR:", err);
-      setReviews([]);
-    }
-  };
+  try {
+    const data = await getReviewsByEventService(eventId);
+
+    setReviews(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("FETCH REVIEW ERROR:", err);
+    setReviews([]);
+  }
+};
 
   useEffect(() => {
     if (!eventId) return;
@@ -64,8 +64,8 @@ export default function EventDetail() {
 
           <p className="mt-4 text-xs text-gray-500">
             <p className="mt-4 text-sm text-gray-400">
-  Organized by #{event.organizerId}
-</p>
+              Organized by #{event.organizerId}
+            </p>
           </p>
         </div>
 

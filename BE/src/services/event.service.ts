@@ -19,8 +19,8 @@ export const createEvent = async (
             totalSeats,
             availableSeats: totalSeats,
             organizerId,
-            location,   // ✅ TAMBAH INI
-            category,   // ✅ TAMBAH INI
+            location,   
+            category,   
         },
     });
 
@@ -110,15 +110,30 @@ export const updateEvent = async (
 };
 
 export const deleteEvent = async (eventId: number) => {
-    const trx = await prisma.transaction.findFirst({
+
+    await prisma.transaction.deleteMany({
         where: { eventId },
     });
 
-    if (trx) {
-        throw new Error("Cannot delete event with transactions");
-    }
+    await prisma.review.deleteMany({
+        where: { eventId },
+    });
+
     const event = await prisma.event.delete({
         where: { id: eventId },
     });
+
     return event;
 }
+
+export const getOrganizerByUserId = async (userId: number) => {
+  return await prisma.organizer.findFirst({
+    where: { userId },
+  });
+};
+
+export const getEventById = async (eventId: number) => {
+  return await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+};
