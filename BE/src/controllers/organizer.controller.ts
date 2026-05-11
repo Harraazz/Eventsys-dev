@@ -3,7 +3,7 @@ import { createOrganizer } from "../services/organizer.service";
 
 export const becomeOrganizer = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user?.id || 1;
+        const userId = (req as any).user?.id;
         const { name } = req.body;
 
         if (!name) {

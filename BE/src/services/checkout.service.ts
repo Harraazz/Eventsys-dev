@@ -1,7 +1,6 @@
 import prisma from "../lib/prisma";
 
-
-export const createTransaction = async (
+export const createCheckout = async (
   userId: number,
   eventId: number,
   quantity: number,
@@ -9,22 +8,22 @@ export const createTransaction = async (
   usePoint?: boolean
 ) => {
   return await prisma.$transaction(async (tx) => {
-
-    // 1. ambil event
+    
     const event = await tx.event.findUnique({
       where: { id: eventId },
     });
 
-    if (!event) throw new Error("Event not found");
-    if (event.availableSeats < quantity) {
-      throw new Error("Not enough seats");
+    if (!event) {
+      throw new Error("Event not found");
     }
 
-    // 3. hitung harga
+    if (event.availableSeats < quantity) {
+      throw new Error("Seat not available");
+    }
+
     let totalPrice = event.price * quantity;
     let finalPrice = totalPrice;
 
-    // 4. apply coupon
     if (couponId) {
       const coupon = await tx.coupon.findFirst({
         where: {
@@ -32,25 +31,34 @@ export const createTransaction = async (
           userId,
           isUsed: false,
           expiresAt: {
-            gte: new Date()
-          }
+            gte: new Date(),
+          },
         },
       });
 
-      if (!coupon) throw new Error("Invalid coupon");
+      if (!coupon) {
+        throw new Error("Coupon not valid");
+      }
 
       finalPrice -= (finalPrice * coupon.discount) / 100;
 
       await tx.coupon.update({
         where: { id: couponId },
-        data: { isUsed: true },
+        data: {
+          isUsed: true,
+        },
       });
     }
 
-    // 5. apply point
+    
     if (usePoint) {
       const points = await tx.point.findMany({
-        where: { userId },
+        where: {
+          userId,
+          expiresAt: {
+            gte: new Date(),
+          },
+        },
       });
 
       const totalPoint = points.reduce((sum, p) => sum + p.amount, 0);
@@ -63,16 +71,7 @@ export const createTransaction = async (
         where: { userId },
       });
     }
-
-    // 6. update seat 🔥
-    await tx.event.update({
-      where: { id: eventId },
-      data: {
-        availableSeats: event.availableSeats - quantity,
-      },
-    });
-
-    // 7. create transaction
+    
     const trx = await tx.transaction.create({
       data: {
         userId,
@@ -83,19 +82,15 @@ export const createTransaction = async (
       },
     });
 
+    await tx.event.update({
+      where: { id: eventId },
+      data: {
+        availableSeats: {
+          decrement: quantity,
+        },
+      },
+    });
+
     return trx;
   });
 };
-
-export const getTransaction = async (userId: number) => {
-  const result = await prisma.transaction.findMany({
-    where: {
-      userId: userId,
-    },
-    include: {
-      event: true,
-      user: true,
-    }
-  })
-  return result;
-}

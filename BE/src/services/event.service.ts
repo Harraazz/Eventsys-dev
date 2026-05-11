@@ -6,7 +6,9 @@ export const createEvent = async (
     price: number,
     date: Date,
     totalSeats: number,
-    organizerId: number
+    organizerId: number,
+    location: string,
+    category: string
 ) => {
     const event = await prisma.event.create({
         data: {
@@ -17,21 +19,42 @@ export const createEvent = async (
             totalSeats,
             availableSeats: totalSeats,
             organizerId,
+            location,   
+            category,   
         },
     });
 
     return event;
 };
 
-export const getListEvent = async () => {
-    const event = await prisma.event.findMany({
-        include: {
-            organizer: true,
-        }
-    })
-    return event
-}
+export const getListEvent = async (userId: number, role: string) => {
 
+    // ✅ ADMIN & CUSTOMER → lihat semua event
+    if (role === "ADMIN" || role === "CUSTOMER") {
+        return await prisma.event.findMany({
+            include: {
+                organizer: true,
+            },
+        });
+    }
+
+    // ✅ ORGANIZER → hanya event miliknya
+    if (role === "ORGANIZER") {
+        return await prisma.event.findMany({
+            where: {
+                organizer: {
+                    userId,
+                },
+            },
+            include: {
+                organizer: true,
+            },
+        });
+    }
+
+    // fallback (optional safety)
+    return [];
+};
 export const updateEvent = async (
     title: string,
     description: string,
@@ -87,15 +110,30 @@ export const updateEvent = async (
 };
 
 export const deleteEvent = async (eventId: number) => {
-    const trx = await prisma.transaction.findFirst({
+
+    await prisma.transaction.deleteMany({
         where: { eventId },
     });
 
-    if (trx) {
-        throw new Error("Cannot delete event with transactions");
-    }
+    await prisma.review.deleteMany({
+        where: { eventId },
+    });
+
     const event = await prisma.event.delete({
         where: { id: eventId },
     });
+
     return event;
 }
+
+export const getOrganizerByUserId = async (userId: number) => {
+  return await prisma.organizer.findFirst({
+    where: { userId },
+  });
+};
+
+export const getEventById = async (eventId: number) => {
+  return await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+};
